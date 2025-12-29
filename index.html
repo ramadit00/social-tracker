@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>SocialPulse — Keyword Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0b;
+            --bg-secondary: #141416;
+            --bg-card: #1a1a1e;
+            --bg-input: #222228;
+            --text-primary: #fafafa;
+            --text-secondary: #8a8a95;
+            --text-muted: #5a5a65;
+            --accent-x: #1d9bf0;
+            --accent-threads: #ffffff;
+            --accent-tiktok: #fe2c55;
+            --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            --border-color: #2a2a32;
+            --success: #22c55e;
+            --warning: #eab308;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --shadow-glow: 0 0 60px rgba(102, 126, 234, 0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            padding: 20px 24px;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .logo-text {
+            font-family: 'Fraunces', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 24px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            overflow: hidden;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+            .sidebar.mobile-open {
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 100;
+                background: var(--bg-primary);
+            }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-section {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-section:last-child {
+            border-bottom: none;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        /* Keywords */
+        .keyword-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .keyword-input {
+            flex: 1;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        .keyword-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn {
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 12px 20px;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card);
+            box-shadow: none;
+        }
+
+        .keyword-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .keyword-tag {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 100px;
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .keyword-tag .count {
+            background: var(--accent-gradient);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 100px;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .keyword-tag .remove {
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            line-height: 1;
+            transition: var(--transition);
+        }
+
+        .keyword-tag .remove:hover {
+            color: var(--accent-tiktok);
+        }
+
+        /* Platform Stats */
+        .platform-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .platform-stat {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-input);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .platform-stat:hover {
+            border-color: var(--border-color);
+        }
+
+        .platform-stat.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .platform-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .platform-icon.x {
+            background: var(--accent-x);
+        }
+
+        .platform-icon.threads {
+            background: var(--accent-threads);
+            color: black;
+        }
+
+        .platform-icon.tiktok {
+            background: var(--accent-tiktok);
+        }
+
+        .platform-info {
+            flex: 1;
+        }
+
+        .platform-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .platform-count {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Content Area */
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .content-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .content-title {
+            font-family: 'Fraunces', serif;
+            font-size: 1.25rem;
+        }
+
+        .content-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Add Post Form */
+        .add-post-section {
+            padding: 20px 24px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .post-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .form-row > * {
+            flex: 1;
+        }
+
+        .platform-select {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238a8a95' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+
+        .platform-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .post-textarea {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            resize: none;
+            min-height: 80px;
+            transition: var(--transition);
+        }
+
+        .post-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .post-textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Posts List */
+        .posts-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+        }
+
+        .posts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .post-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            animation: fadeIn 0.4s ease;
+            transition: var(--transition);
+        }
+
+        .post-card:hover {
+            border-color: #3a3a42;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .post-platform {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .post-platform-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.7rem;
+        }
+
+        .post-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .post-delete {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .post-delete:hover {
+            background: rgba(254, 44, 85, 0.1);
+            color: var(--accent-tiktok);
+        }
+
+        .post-content {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            word-break: break-word;
+        }
+
+        .post-content .highlight {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .post-keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .post-keyword {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: var(--bg-input);
+            border-radius: 100px;
+            color: var(--text-secondary);
+        }
+
+        .post-url {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .post-url a {
+            color: var(--accent-x);
+            font-size: 0.85rem;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .post-url a:hover {
+            text-decoration: underline;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 24px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-family: 'Fraunces', serif;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            color: var(--text-secondary);
+            max-width: 300px;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 900px) {
+            .mobile-menu-btn {
+                display: flex;
+            }
+            .header-stats {
+                display: none;
+            }
+        }
+
+        /* Export Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-title {
+            font-family: 'Fraunces', serif;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .modal-text {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-card);
+            border: 1px solid var(--success);
+            border-radius: var(--radius-md);
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 300;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .toast.active {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast-icon {
+            color: var(--success);
+            font-size: 1.2rem;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">📊</div>
+                    <span class="logo-text">SocialPulse</span>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalPosts">0</div>
+                        <div class="stat-label">Posts</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalKeywords">0</div>
+                        <div class="stat-label">Keywords</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalMatches">0</div>
+                        <div class="stat-label">Matches</div>
+                    </div>
+                </div>
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-section">
+                    <div class="section-title">Track Keywords</div>
+                    <div class="keyword-input-group">
+                        <input type="text" class="keyword-input" id="keywordInput" placeholder="Enter keyword..." onkeypress="handleKeywordKeypress(event)">
+                        <button class="btn" onclick="addKeyword()">Add</button>
+                    </div>
+                    <div class="keyword-list" id="keywordList"></div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-title">Platforms</div>
+                    <div class="platform-stats">
+                        <div class="platform-stat active" data-platform="all" onclick="filterPlatform('all')">
+                            <div class="platform-icon" style="background: var(--accent-gradient);">All</div>
+                            <div class="platform-info">
+                                <div class="platform-name">All Platforms</div>
+                                <div class="platform-count"><span id="countAll">0</span> posts</div>
+                            </div>
+                        </div>
+                        <div class="platform-stat" data-platform="x" onclick="filterPlatform('x')">
+                            <div class="platform-icon x">𝕏</div>
+                            <div class="platform-info">
+                                <div class="platform-name">X (Twitter)</div>
+                                <div class="platform-count"><span id="countX">0</span> posts</div>
+                            </div>
+                        </div>
+                        <div class="platform-stat" data-platform="threads" onclick="filterPlatform('threads')">
+                            <div class="platform-icon threads">@</div>
+                            <div class="platform-info">
+                                <div class="platform-name">Threads</div>
+                                <div class="platform-count"><span id="countThreads">0</span> posts</div>
+                            </div>
+                        </div>
+                        <div class="platform-stat" data-platform="tiktok" onclick="filterPlatform('tiktok')">
+                            <div class="platform-icon tiktok">♪</div>
+                            <div class="platform-info">
+                                <div class="platform-name">TikTok</div>
+                                <div class="platform-count"><span id="countTiktok">0</span> posts</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-title">Actions</div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button class="btn btn-secondary" onclick="openExportModal()" style="width: 100%;">📤 Export Data</button>
+                        <button class="btn btn-secondary" onclick="clearAllPosts()" style="width: 100%;">🗑️ Clear Posts</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Content Area -->
+            <main class="content-area">
+                <div class="content-header">
+                    <h2 class="content-title" id="contentTitle">All Posts</h2>
+                    <div class="content-actions">
+                        <button class="btn btn-secondary" onclick="sortPosts('newest')">Newest</button>
+                        <button class="btn btn-secondary" onclick="sortPosts('oldest')">Oldest</button>
+                    </div>
+                </div>
+
+                <!-- Add Post Form -->
+                <div class="add-post-section">
+                    <form class="post-form" onsubmit="addPost(event)">
+                        <div class="form-row">
+                            <select class="platform-select" id="postPlatform">
+                                <option value="x">𝕏 X (Twitter)</option>
+                                <option value="threads">@ Threads</option>
+                                <option value="tiktok">♪ TikTok</option>
+                            </select>
+                            <input type="text" class="keyword-input" id="postUrl" placeholder="Post URL (optional)">
+                        </div>
+                        <textarea class="post-textarea" id="postContent" placeholder="Paste post content here..." required></textarea>
+                        <button type="submit" class="btn" style="align-self: flex-end;">+ Add Post</button>
+                    </form>
+                </div>
+
+                <!-- Posts List -->
+                <div class="posts-container">
+                    <div class="posts-list" id="postsList">
+                        <div class="empty-state" id="emptyState">
+                            <div class="empty-icon">📭</div>
+                            <h3 class="empty-title">No posts yet</h3>
+                            <p class="empty-text">Add keywords to track, then paste social media posts to analyze them.</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal-overlay" id="exportModal">
+        <div class="modal">
+            <h3 class="modal-title">Export Data</h3>
+            <p class="modal-text">Choose your export format. Your data will be downloaded to your device.</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeExportModal()">Cancel</button>
+                <button class="btn" onclick="exportData('csv')">CSV</button>
+                <button class="btn" onclick="exportData('json')">JSON</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span class="toast-icon">✓</span>
+        <span id="toastMessage">Success!</span>
+    </div>
+
+    <script>
+        // App State
+        let state = {
+            keywords: [],
+            posts: [],
+            currentFilter: 'all',
+            sortOrder: 'newest'
+        };
+
+        // Load from localStorage
+        function loadState() {
+            const saved = localStorage.getItem('socialPulseState');
+            if (saved) {
+                state = JSON.parse(saved);
+            }
+            render();
+        }
+
+        // Save to localStorage
+        function saveState() {
+            localStorage.setItem('socialPulseState', JSON.stringify(state));
+        }
+
+        // Add Keyword
+        function addKeyword() {
+            const input = document.getElementById('keywordInput');
+            const keyword = input.value.trim().toLowerCase();
+            
+            if (keyword && !state.keywords.includes(keyword)) {
+                state.keywords.push(keyword);
+                input.value = '';
+                saveState();
+                render();
+                showToast('Keyword added!');
+            }
+        }
+
+        function handleKeywordKeypress(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addKeyword();
+            }
+        }
+
+        // Remove Keyword
+        function removeKeyword(keyword) {
+            state.keywords = state.keywords.filter(k => k !== keyword);
+            saveState();
+            render();
+            showToast('Keyword removed');
+        }
+
+        // Add Post
+        function addPost(e) {
+            e.preventDefault();
+            
+            const platform = document.getElementById('postPlatform').value;
+            const content = document.getElementById('postContent').value.trim();
+            const url = document.getElementById('postUrl').value.trim();
+            
+            if (!content) return;
+            
+            const post = {
+                id: Date.now(),
+                platform,
+                content,
+                url,
+                timestamp: new Date().toISOString(),
+                matchedKeywords: findMatchedKeywords(content)
+            };
+            
+            state.posts.unshift(post);
+            
+            document.getElementById('postContent').value = '';
+            document.getElementById('postUrl').value = '';
+            
+            saveState();
+            render();
+            showToast('Post added!');
+        }
+
+        // Find matched keywords in content
+        function findMatchedKeywords(content) {
+            const lowerContent = content.toLowerCase();
+            return state.keywords.filter(keyword => lowerContent.includes(keyword));
+        }
+
+        // Delete Post
+        function deletePost(id) {
+            state.posts = state.posts.filter(p => p.id !== id);
+            saveState();
+            render();
+            showToast('Post deleted');
+        }
+
+        // Filter by platform
+        function filterPlatform(platform) {
+            state.currentFilter = platform;
+            
+            document.querySelectorAll('.platform-stat').forEach(el => {
+                el.classList.toggle('active', el.dataset.platform === platform);
+            });
+            
+            const titles = {
+                all: 'All Posts',
+                x: 'X (Twitter) Posts',
+                threads: 'Threads Posts',
+                tiktok: 'TikTok Posts'
+            };
+            document.getElementById('contentTitle').textContent = titles[platform];
+            
+            render();
+        }
+
+        // Sort posts
+        function sortPosts(order) {
+            state.sortOrder = order;
+            saveState();
+            render();
+        }
+
+        // Highlight keywords in content
+        function highlightKeywords(content) {
+            let highlighted = escapeHtml(content);
+            state.keywords.forEach(keyword => {
+                const regex = new RegExp(`(${escapeRegex(keyword)})`, 'gi');
+                highlighted = highlighted.replace(regex, '<span class="highlight">$1</span>');
+            });
+            return highlighted;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function escapeRegex(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // Render UI
+        function render() {
+            renderKeywords();
+            renderPosts();
+            renderStats();
+        }
+
+        function renderKeywords() {
+            const container = document.getElementById('keywordList');
+            
+            if (state.keywords.length === 0) {
+                container.innerHTML = '<span style="color: var(--text-muted); font-size: 0.85rem;">No keywords yet</span>';
+                return;
+            }
+            
+            container.innerHTML = state.keywords.map(keyword => {
+                const count = state.posts.filter(p => 
+                    p.content.toLowerCase().includes(keyword)
+                ).length;
+                
+                return `
+                    <div class="keyword-tag">
+                        <span>${keyword}</span>
+                        <span class="count">${count}</span>
+                        <span class="remove" onclick="removeKeyword('${keyword}')">×</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPosts() {
+            const container = document.getElementById('postsList');
+            const emptyState = document.getElementById('emptyState');
+            
+            let filteredPosts = state.posts;
+            
+            if (state.currentFilter !== 'all') {
+                filteredPosts = filteredPosts.filter(p => p.platform === state.currentFilter);
+            }
+            
+            // Sort
+            filteredPosts = [...filteredPosts].sort((a, b) => {
+                const dateA = new Date(a.timestamp);
+                const dateB = new Date(b.timestamp);
+                return state.sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+            });
+            
+            if (filteredPosts.length === 0) {
+                container.innerHTML = '';
+                container.appendChild(emptyState.cloneNode(true));
+                return;
+            }
+            
+            const platformIcons = {
+                x: { icon: '𝕏', class: 'x' },
+                threads: { icon: '@', class: 'threads' },
+                tiktok: { icon: '♪', class: 'tiktok' }
+            };
+            
+            const platformNames = {
+                x: 'X (Twitter)',
+                threads: 'Threads',
+                tiktok: 'TikTok'
+            };
+            
+            container.innerHTML = filteredPosts.map(post => {
+                const platform = platformIcons[post.platform];
+                const date = new Date(post.timestamp).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const matchedKeywords = findMatchedKeywords(post.content);
+                
+                return `
+                    <div class="post-card">
+                        <div class="post-header">
+                            <div class="post-platform">
+                                <div class="post-platform-icon ${platform.class}">${platform.icon}</div>
+                                <span class="post-meta">${platformNames[post.platform]} • ${date}</span>
+                            </div>
+                            <button class="post-delete" onclick="deletePost(${post.id})">🗑️</button>
+                        </div>
+                        <div class="post-content">${highlightKeywords(post.content)}</div>
+                        ${matchedKeywords.length > 0 ? `
+                            <div class="post-keywords">
+                                ${matchedKeywords.map(k => `<span class="post-keyword">#${k}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                        ${post.url ? `
+                            <div class="post-url">
+                                <a href="${escapeHtml(post.url)}" target="_blank" rel="noopener">${escapeHtml(post.url)}</a>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderStats() {
+            document.getElementById('totalPosts').textContent = state.posts.length;
+            document.getElementById('totalKeywords').textContent = state.keywords.length;
+            
+            let totalMatches = 0;
+            state.posts.forEach(post => {
+                totalMatches += findMatchedKeywords(post.content).length;
+            });
+            document.getElementById('totalMatches').textContent = totalMatches;
+            
+            document.getElementById('countAll').textContent = state.posts.length;
+            document.getElementById('countX').textContent = state.posts.filter(p => p.platform === 'x').length;
+            document.getElementById('countThreads').textContent = state.posts.filter(p => p.platform === 'threads').length;
+            document.getElementById('countTiktok').textContent = state.posts.filter(p => p.platform === 'tiktok').length;
+        }
+
+        // Export
+        function openExportModal() {
+            document.getElementById('exportModal').classList.add('active');
+        }
+
+        function closeExportModal() {
+            document.getElementById('exportModal').classList.remove('active');
+        }
+
+        function exportData(format) {
+            let content, filename, type;
+            
+            if (format === 'json') {
+                content = JSON.stringify(state, null, 2);
+                filename = 'socialpulse-export.json';
+                type = 'application/json';
+            } else {
+                // CSV
+                const headers = ['Platform', 'Content', 'URL', 'Timestamp', 'Matched Keywords'];
+                const rows = state.posts.map(p => [
+                    p.platform,
+                    `"${p.content.replace(/"/g, '""')}"`,
+                    p.url || '',
+                    p.timestamp,
+                    findMatchedKeywords(p.content).join('; ')
+                ]);
+                content = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+                filename = 'socialpulse-export.csv';
+                type = 'text/csv';
+            }
+            
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            closeExportModal();
+            showToast('Data exported!');
+        }
+
+        // Clear all posts
+        function clearAllPosts() {
+            if (confirm('Are you sure you want to delete all posts? This cannot be undone.')) {
+                state.posts = [];
+                saveState();
+                render();
+                showToast('All posts cleared');
+            }
+        }
+
+        // Mobile sidebar
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+        }
+
+        // Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('active');
+            
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 2500);
+        }
+
+        // Close modal on overlay click
+        document.getElementById('exportModal').addEventListener('click', (e) => {
+            if (e.target.id === 'exportModal') {
+                closeExportModal();
+            }
+        });
+
+        // Initialize
+        loadState();
+    </script>
+</body>
+</html>
